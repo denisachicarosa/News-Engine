@@ -1,0 +1,26 @@
+﻿@model PlatformaDeStiri.Models.News
+
+<h3>@Model.Title</h3>
+<p>@Model.Content</p>
+
+<table>
+    <tr>
+        <td>
+            @Model.UserID
+        </td>
+        <td>
+            @Model.Date
+        </td>
+        <a class="btn btn-success" href="/News/Edit/@Model.ID">Modifica stire </a>
+        <br />
+        <td>
+            <form method="post" action="/News/Delete/@Model.ID">
+
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <br />
+                <button class="btn btn-success" type="submit">Sterge stire</button>
+
+            </form>
+        </td>
+    </tr>
+</table>

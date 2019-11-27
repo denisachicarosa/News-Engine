@@ -1,0 +1,26 @@
+﻿@model PlatformaDeStiri.Models.Comment
+
+<p>@Model.commContent</p>
+
+<table>
+    <tr>
+        <td>
+            @Model.commUserID
+        </td>
+        <td>
+            @Model.commDate
+        </td>
+        <a class="btn btn-success" href="/Comment/Edit/@Model.commID">Modifica comentariu </a>
+        <br />
+        <td>
+            <form method="post" action="/Comment/Delete/@Model.commID">
+
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <br />
+                <button class="btn btn-success" type="submit">Sterge comentariu</button>
+
+            </form>
+        </td>
+    </tr>
+</table>
+

@@ -1,0 +1,16 @@
+﻿
+<h3>Afisare stiri</h3>
+
+@if (TempData.ContainsKey("message"))
+{
+    <hr />
+    <br />
+    <h5>@TempData["message"]</h5>
+    <hr />
+    <br />
+}
+
+@foreach (PlatformaDeStiri.Models.News elm in ViewBag.news)
+{
+    @Html.Partial("NewsInfo", elm)
+}

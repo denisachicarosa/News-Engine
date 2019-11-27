@@ -1,0 +1,20 @@
+﻿@model PlatformaDeStiri.Models.News
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<form method="post" action="News/Delete/@Model.ID">
+
+    @Html.HttpMethodOverride(HttpVerbs.Delete)
+    <br />
+    @using (Html.BeginForm(actionName: "Delete", controllerName: "News"))
+    {
+        @Html.HiddenFor(model => model.ID)}
+
+    <button class="btn btn-success" type="submit">Sterge articol</button>
+
+</form>
+

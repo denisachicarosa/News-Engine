@@ -1,0 +1,23 @@
+﻿@model PlatformaDeStiri.Models.Category
+
+@{
+    ViewBag.Title = "Editare categorie";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form method="post" action="/Category/Edit/@Model.ID">
+
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+    @Html.HiddenFor(m => m.ID)
+
+
+
+    @Html.Label("CategoryName", "Nume categorie")
+    <br />
+    @Html.EditorFor(m => m.Name)
+    <br /><br />
+
+    <button class="btn btn-success" type="submit">Modifica categoria</button>
+</form>
+
