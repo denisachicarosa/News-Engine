@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace PlatformaDeStiri.Controllers
 {
+
     public class CategoryController : Controller
     {
 
@@ -25,6 +26,7 @@ namespace PlatformaDeStiri.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet]
         public ActionResult New()
         {
@@ -33,6 +35,7 @@ namespace PlatformaDeStiri.Controllers
             return View(category);
         }
 
+        [Authorize(Roles = "Administrator")]
         public ActionResult New(Category category)
         {
             try
@@ -50,13 +53,15 @@ namespace PlatformaDeStiri.Controllers
 
         }
 
+        [Authorize(Roles = "Administrator")]
         public ActionResult Edit(int id)
         {
             Category category = db.Categories.Find(id);
             return View(category);
             
         }
-        
+
+        [Authorize(Roles = "Administrator")]
         [HttpPut]
         public ActionResult Edit(int id, Category requestCategory)
         {
@@ -81,7 +86,8 @@ namespace PlatformaDeStiri.Controllers
             }
         }
 
-        
+
+        [Authorize(Roles = "Administrator")]
         [HttpDelete]
         public ActionResult Delete(int id)
         {
