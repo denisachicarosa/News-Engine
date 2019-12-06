@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index - all users</h2>
+
+@foreach (PlatformaDeStiri.Models.ApplicationUser user in ViewBag.UsersList)
+{
+    @Html.Partial("UsersInfo", user)
+
+    <form method="get" action="/Users/Show/@user.Id">
+        <button type="submit">Show user</button>
+    </form>
+
+    <hr />
+}
+

@@ -1,0 +1,28 @@
+﻿@model PlatformaDeStiri.Models.ApplicationUser
+
+<i class="glyphicon glyphicon-user"></i>
+@Html.Label("UserName", "Nume utilizator", new { @class = "" })
+<p>@Model.UserName</p>
+<br />
+<i class="glyphicon glyphicon-envelope"></i>
+@Html.Label("Email", "Email utilizator", new { @class = "" })
+<p>@Model.Email</p>
+<br />
+<i class="glyphicon glyphicon-phone"></i>
+@Html.Label("PhoneNumber", "Numar telefon")
+<p>@Model.PhoneNumber</p>
+<br />
+
+
+<form method="post" action="/Users/Edit/@Model.Id">
+    <button type="submit">Modifica user</button>
+</form>
+
+
+@if (Model.Id != ViewBag.CurrentUser)
+{
+    <form method="post" action="/Users/Delete/@Model.Id">
+        @Html.HttpMethodOverride(HttpVerbs.Delete)
+        <button type="submit">Sterge user</button>
+    </form>
+}
