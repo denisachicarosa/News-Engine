@@ -1,23 +1,37 @@
 ﻿@model PlatformaDeStiri.Models.News
 
-<h3>@Model.Title</h3>
-<p>Categorie: @Model.Category.Name</p>
+<a href="/News/Show/@Model.ID">
+    <h3>@Model.Title</h3>
+</a>
 <p>@Model.Content</p>
 
-<i class="glyphicon glyphicon-user"></i> <i>articol scris de</i> <strong> @Model.User.UserName </strong>
 <table>
     <tr>
-     
+        <td colspan="2">
+            <p>Categorie: @Model.Category.Name</p>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <i class="glyphicon glyphicon-user"></i> 
+            <i>articol scris de</i> 
+            <strong> @Model.User.UserName </strong>
+        </td>
         <td>
             @Model.Date
         </td>
-        <a class="btn btn-success" href="/News/Edit/@Model.ID">Modifica stire </a>
-        <br />
+        
+    </tr>
+
+    <tr>
+        <td>
+            <a class="btn btn-success" href="/News/Edit/@Model.ID">Modifica stire </a>
+        </td>
         <td>
             <form method="post" action="/News/Delete/@Model.ID">
 
                 @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <br />
                 <button class="btn btn-success" type="submit">Sterge stire</button>
 
             </form>

@@ -17,5 +17,6 @@ namespace PlatformaDeStiri.Models
 
 
         public virtual News news { get; set; }
+        public virtual ApplicationUser user { get; set; }
     }
 }

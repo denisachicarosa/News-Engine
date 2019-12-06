@@ -39,6 +39,26 @@ namespace PlatformaDeStiri.Controllers
         }
 
         [HttpPost]
+        public ActionResult AddComment (string newsId, string commStr)
+        {
+            int id = System.Int32.Parse(newsId);
+            Comment newComment = new Comment();
+            newComment.commUserID = User.Identity.GetUserId();
+            newComment.commNewsID = id;
+            newComment.commContent = commStr;
+            newComment.commDate = DateTime.Now;
+            newComment.news = db.News.Find(id);
+            newComment.user = db.Users.Find(newComment.commUserID);
+
+            db.Comments.Add(newComment);
+            
+            db.SaveChanges();
+            TempData["message"] = "Comentariul a fost adaugat.";
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
         public ActionResult New(News news)
         {
             news.Categories = GetAllCategories();

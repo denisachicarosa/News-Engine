@@ -14,7 +14,7 @@ namespace PlatformaDeStiri.Controllers
         // GET: Comment
         public ActionResult Index()
         {
-            var comm = db.Comments;
+            var comm = db.Comments.Include("News").Include("User");
 
             if (TempData.ContainsKey("message"))
             {
@@ -45,7 +45,7 @@ namespace PlatformaDeStiri.Controllers
             {
                 db.Comments.Add(comm);
                 db.SaveChanges();
-                TempData["message"] = "Comentariul a fost adaugat! ";
+                TempData["message"] = "Comentariul a fost adauuuuuugat! ";
                 return RedirectToAction("Index");
             }
             catch (Exception e)

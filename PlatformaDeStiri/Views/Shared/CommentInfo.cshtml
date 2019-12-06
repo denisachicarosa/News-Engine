@@ -4,14 +4,19 @@
 
 <table>
     <tr>
-        <td>
-            @Model.commUserID
+        <td colspan="2">
+            @Model.user.UserName
         </td>
-        <td>
+    </tr>
+    <tr>
+        <td colspan="2">
             @Model.commDate
         </td>
-        <a class="btn btn-success" href="/Comment/Edit/@Model.commID">Modifica comentariu </a>
-        <br />
+    </tr>
+    <tr>
+        <td>
+            <a class="btn btn-success" href="/Comment/Edit/@Model.commID">Modifica comentariu </a>
+        </td>
         <td>
             <form method="post" action="/Comment/Delete/@Model.commID">
 

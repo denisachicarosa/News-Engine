@@ -4,8 +4,38 @@
     ViewBag.Title = "Show";
 }
 
-<h2>Show</h2>
+@if (TempData.ContainsKey("message"))
+{
+    <hr />
+    <h5>@TempData["message"]</h5>
+    <hr />
+}
 
 @Html.Partial("NewsInfo", Model)
 
-@Html.Partial("CommentInfo",)
+@if (User.Identity.IsAuthenticated)
+{
+    <form method="post" action="/News/AddComment">
+        <input type="text" name="newsId" style="visibility:hidden" value="@Model.ID"/> 
+        <br />
+        <textarea name="commStr">
+        </textarea>
+        <button class="btn btn-success" type="submit">Adauga comentariu</button>
+    </form>
+}
+
+
+<h3>Comment section:</h3>
+
+@if (Model.Comments.Count() == 0)
+{
+    <p>No comments added it.</p>
+}
+else
+{
+    foreach (PlatformaDeStiri.Models.Comment comment in Model.Comments)
+    {
+        @Html.Partial("CommentInfo", comment)
+        <hr />
+    }
+}

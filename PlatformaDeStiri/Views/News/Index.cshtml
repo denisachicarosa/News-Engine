@@ -4,10 +4,8 @@
 @if (TempData.ContainsKey("message"))
 {
     <hr />
-    <br />
     <h5>@TempData["message"]</h5>
     <hr />
-    <br />
 }
 
 @foreach (PlatformaDeStiri.Models.News elm in ViewBag.news)
