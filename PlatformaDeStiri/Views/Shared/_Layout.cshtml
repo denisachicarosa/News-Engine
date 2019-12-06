@@ -21,7 +21,19 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    @if (!User.Identity.IsAuthenticated || User.IsInRole("User") || User.IsInRole("Administrator") || User.IsInRole("Editor"))
+                    {
+                        <li>@Html.ActionLink("Stiri", "Index", "News")</li>
+                    }
+                    @if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+                    {
+                        <li>@Html.ActionLink("Adauga stire", "New", "News")</li>
+                    }
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <li>@Html.ActionLink("Adauga categorie", "New", "Category")</li>
+                        <li>@Html.ActionLink("Vezi utilizatori", "Index", "Users")</li>
+                    }
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>

@@ -8,11 +8,13 @@ using System.Web.Mvc;
 
 namespace PlatformaDeStiri.Controllers
 {
+    
     public class NewsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Stire
+        
         public ActionResult Index()
         {
             var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions");
@@ -26,6 +28,7 @@ namespace PlatformaDeStiri.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Editor, Administrator")]
         [HttpGet]
         public ActionResult New()
         {
@@ -38,6 +41,7 @@ namespace PlatformaDeStiri.Controllers
             return View(news);
         }
 
+        [Authorize(Roles = "Editor, Administrator")]
         [HttpPost]
         public ActionResult AddComment (string newsId, string commStr)
         {
@@ -79,6 +83,8 @@ namespace PlatformaDeStiri.Controllers
 
         }
 
+
+        [Authorize(Roles = "User, Editor, Administrator")]
         [HttpGet]
         public ActionResult Show(int id)
         {
@@ -99,6 +105,7 @@ namespace PlatformaDeStiri.Controllers
 
         }
 
+        [Authorize(Roles = "Editor, Administrator")]
         [HttpGet]
         public ActionResult Edit(int id)
         {
@@ -109,32 +116,61 @@ namespace PlatformaDeStiri.Controllers
                     throw (new Exception());
                 news.Categories = GetAllCategories();
 
-                return View(news);
+                if (news.UserID == User.Identity.GetUserId() || User.IsInRole("Administrator"))
+                {
+                    return View(news);
+                }
+                else
+                {
+                    TempData["message"] = "Nu aveti dreptul sa faceti modificari!";
+                    return RedirectToAction("Index");
+                }
+
             }
             catch (Exception)
             {
-                ViewBag.error = "Could not show element with ID=" +
+                ViewBag.error = "Could not edit element with ID=" +
                     id + ". ";
                 return View("Error");
             }
         }
 
+        [Authorize(Roles = "Editor, Administrator")]
         [HttpPost]
-        public ActionResult Edit(News news)
+        public ActionResult Edit(int id, News news)
         {
+            news.Categories = GetAllCategories();
             try
             {
-                News db_news = db.News.Find(news.ID);
-                db_news.Title = news.Title;
-                db_news.Content = news.Content;
-                db_news.Date = DateTime.Now;
-                db_news.UserID = User.Identity.GetUserId();
-                db_news.CategoryID = news.CategoryID;
-                db.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    News db_news = db.News.Find(id);
+                    if (db_news.UserID == User.Identity.GetUserId() || User.IsInRole("Administrator"))
+                    {
+                        if (TryUpdateModel(news))
+                        {
+                            db_news.Title = news.Title;
+                            db_news.Content = news.Content;
+                            db_news.Date = DateTime.Now;
+                            db_news.UserID = User.Identity.GetUserId();
+                            db_news.CategoryID = news.CategoryID;
+                            db.SaveChanges();
 
-                TempData["message"] = "Stirea cu titlul '" +
-                    news.Title + "' a fost actualizata.";
-                return RedirectToAction("Index");
+                            TempData["message"] = "Stirea cu titlul '" +
+                                news.Title + "' a fost actualizata.";
+                        }
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        TempData["message"] = "Nu aveti dreptul sa faceti modificari!";
+                        return RedirectToAction("Index");
+                    }
+                }
+                else
+                {
+                    return View(news);
+                }
             }
             catch (Exception)
             {
@@ -144,16 +180,25 @@ namespace PlatformaDeStiri.Controllers
             }
         }
 
+        [Authorize(Roles = "Editor, Administrator")]
         [HttpDelete]
         public ActionResult Delete(int id)
         {
-
+           
             News news = db.News.Find(id);
-            db.News.Remove(news);
-            db.SaveChanges();
-            TempData["message"] = "Articolul cu numele " +
-                news.Title + " a fost sters din baza de date";
-            return RedirectToAction("Index");
+            if (news.UserID == User.Identity.GetUserId() || User.IsInRole("Administrator"))
+            {
+                db.News.Remove(news);
+                db.SaveChanges();
+                TempData["message"] = "Articolul cu numele " +
+                    news.Title + " a fost sters din baza de date";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["message"] = "Nu aveti dreptul de a sterge aceasta stire";
+                return RedirectToAction("Index");
+            }
         }
 
         [NonAction]
@@ -177,5 +222,9 @@ namespace PlatformaDeStiri.Controllers
 
             return selectList;
         }
+
+
     }
+
+
 }
