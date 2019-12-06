@@ -14,5 +14,8 @@ namespace PlatformaDeStiri.Models
         public DateTime commDate { get; set; }
         public string commUserID { get; set; }
         public int commNewsID { get; set; }
+
+
+        public virtual News news { get; set; }
     }
 }

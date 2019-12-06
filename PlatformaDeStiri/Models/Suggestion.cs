@@ -17,5 +17,7 @@ namespace PlatformaDeStiri.Models
        
         public int suggState { get; set; }
         public enum states {Pending, Accepted, Rejected };
+
+        public virtual News news { get; set; }
     }
 }
