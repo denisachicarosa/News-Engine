@@ -1,13 +1,13 @@
 ﻿@model PlatformaDeStiri.Models.News
 
 <h3>@Model.Title</h3>
+<p>Categorie: @Model.Category.Name</p>
 <p>@Model.Content</p>
 
+<i class="glyphicon glyphicon-user"></i> <i>articol scris de</i> <strong> @Model.User.UserName </strong>
 <table>
     <tr>
-        <td>
-            @Model.UserID
-        </td>
+     
         <td>
             @Model.Date
         </td>

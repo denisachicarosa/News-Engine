@@ -15,7 +15,7 @@ namespace PlatformaDeStiri.Controllers
         // GET: Stire
         public ActionResult Index()
         {
-            var news = db.News.Include("Category").Include("Comment").Include("Suggestion");
+            var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions");
 
             if (TempData.ContainsKey("message"))
             {
