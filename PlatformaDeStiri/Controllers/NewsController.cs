@@ -11,12 +11,14 @@ namespace PlatformaDeStiri.Controllers
     
     public class NewsController : Controller
     {
+        static int NEWS_PER_PAGE = 3;
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Stire
         
         public ActionResult Index()
         {
+            // Query the database for all the news
             var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions");
 
             if (TempData.ContainsKey("message"))
@@ -24,8 +26,45 @@ namespace PlatformaDeStiri.Controllers
                 ViewBag.message = TempData["message"].ToString();
             }
 
-            ViewBag.news = news;
+            // Complete the ViewBag.maxPgNr and ViewBag.pageNr
+            ViewBag.maxPgNr = news.Count() / NEWS_PER_PAGE + 1;
+            ViewBag.pageNr = TempData.ContainsKey("pageNr") ? TempData["pageNr"] : 1;
+            
+            // Select from the list
+            List<News> newstoShow = new List<News>();
+            int firstIndex = NEWS_PER_PAGE * (ViewBag.pageNr - 1);
+            int lastIndex = min(firstIndex + NEWS_PER_PAGE, news.Count());
+            int ind = 0;
+
+            foreach(News dbNews in news)
+            {
+                if(ind >= firstIndex && ind < lastIndex)
+                {
+                    newstoShow.Add(dbNews);
+                }
+
+                if (ind >= lastIndex)
+                    break;
+
+                ind++;
+            }
+
+            // Load trimmed list into viewbag
+            ViewBag.news = newstoShow;
             return View();
+        }
+
+        [HttpGet]
+        public ActionResult PageSwitch (int currPage)
+        {
+            TempData["pageNr"] = currPage;
+            return RedirectToAction("Index");
+        }
+
+        [NonAction]
+        private int min(int v1, int v2)
+        {
+            return v1 < v2 ? v1 : v2;
         }
 
         [Authorize(Roles = "Editor, Administrator")]

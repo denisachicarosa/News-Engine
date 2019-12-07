@@ -8,7 +8,72 @@
     <hr />
 }
 
+@{
+    int prevPage = ViewBag.pageNr - 1;
+    int nextPage = ViewBag.pageNr + 1;
+}
+
 @foreach (PlatformaDeStiri.Models.News elm in ViewBag.news)
 {
     @Html.Partial("NewsInfo", elm)
 }
+
+<!-- Styles for bottom page ...-->
+@if (ViewBag.pageNr.Equals(1))
+{
+    <style>
+        .prevPageStyle {
+            visibility: hidden;
+        }
+    </style>
+}
+else
+{
+    <style>
+        .prevPageStyle {
+            visibility: visible;
+        }
+    </style>
+}
+
+@if (ViewBag.maxPgNr == ViewBag.pageNr)
+{
+    <style>
+        .nextPageStyle {
+            visibility: hidden;
+        }
+    </style>
+}
+else
+{
+    <style>
+        .nextPageStyle {
+            visibility: visible;
+        }
+    </style>
+}
+
+
+
+<table align="center">
+    <tr>
+
+        <td class="prevPageStyle">
+                <button type="submit">
+                    @Html.ActionLink("<<", "PageSwitch", "News", new { currPage = prevPage }, null)
+                </button>
+        </td>
+
+        <td>
+            <button>   @ViewBag.pageNr   </button>
+        </td>
+
+        <td class="nextPageStyle">
+            <button>
+                @Html.ActionLink(">>", "PageSwitch", "News", new { currPage = nextPage }, null)
+            </button>
+        </td>
+
+    </tr>
+</table>
+
