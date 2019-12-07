@@ -15,6 +15,7 @@
 
 @if (User.Identity.IsAuthenticated)
 {
+    <button>@Html.ActionLink("Adauga o sugestie", "New", "Suggestion", new { newsId = Model.ID }, null)</button>
     <form method="post" action="/News/AddComment">
         <input type="text" name="newsId" style="visibility:hidden" value="@Model.ID"/> 
         <br />

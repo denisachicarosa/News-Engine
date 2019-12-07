@@ -25,10 +25,14 @@
                     {
                         <li>@Html.ActionLink("Stiri", "Index", "News")</li>
                     }
+                    @if (User.IsInRole("User") || User.IsInRole("Administrator") || User.IsInRole("Editor"))
+                    {
+                        <li>@Html.ActionLink("Sugestii", "Index", "Suggestion")</li>
+                    }
                     @if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
                     {
                         <li>@Html.ActionLink("Adauga stire", "New", "News")</li>
-                        <li>@Html.ActionLink("Stiri proprii","MyNews","News")</li>
+                        <li>@Html.ActionLink("Stiri proprii", "MyNews", "News")</li>
                     }
                     @if (User.IsInRole("Administrator"))
                     {

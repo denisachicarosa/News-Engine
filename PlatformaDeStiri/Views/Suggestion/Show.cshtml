@@ -1,0 +1,11 @@
+﻿@model PlatformaDeStiri.Models.Suggestion
+
+
+@Html.Partial("SuggestionInfo", Model)
+
+@if (Model.EditorID == ViewBag.currentUser)
+{
+   @Html.ActionLink("Respinge","Reject","Suggestion", new { id = Model.suggID }, null)
+   @Html.ActionLink("Accepta","Accept","Suggestion", new { id = Model.suggID}, null)
+
+}

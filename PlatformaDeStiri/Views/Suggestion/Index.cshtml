@@ -1,0 +1,33 @@
+﻿@model PlatformaDeStiri.Models.Suggestion
+
+@if (TempData.ContainsKey("message"))
+{
+    <hr />
+    <h5>@TempData["message"]</h5>
+    <hr />
+}
+
+    <h2> Sugestii trimise: </h2>
+@if (ViewBag.sentSugg.Count > 0)
+{
+
+    foreach (PlatformaDeStiri.Models.Suggestion s in ViewBag.sentSugg)
+    {
+        
+        @Html.Partial("SuggestionInfo", s);
+    }
+}
+<br />
+<hr />
+@if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+{
+    if (ViewBag.receivedSugg.Count > 0)
+    {
+        <h2> Sugestii primite: </h2>
+
+        foreach (PlatformaDeStiri.Models.Suggestion s in ViewBag.receivedSugg)
+        {
+            @Html.Partial("SuggestionInfo", s);
+        }
+    }
+}

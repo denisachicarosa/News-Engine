@@ -10,14 +10,16 @@ namespace PlatformaDeStiri.Models
     {
         [Key]
         public int suggID { get; set; }
+        public string suggTitle { get; set; }
         public string suggContent { get; set; }
         public DateTime suggDate { get; set; }
-        public string suggserID { get; set; }
-        public int suggNewsID { get; set; }
+        public string UserID { get; set; }
+        public string EditorID { get; set; }
        
         public int suggState { get; set; }
         public enum states {Pending, Accepted, Rejected };
 
-        public virtual News news { get; set; }
+        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser Editor { get; set; }
     }
 }

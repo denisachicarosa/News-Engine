@@ -1,0 +1,57 @@
+﻿@model PlatformaDeStiri.Models.Suggestion
+
+@Html.Label("suggTitle", "Denumire sugestie: ")
+<h4>@Model.suggTitle</h4>
+<br />
+<p>@Model.suggContent</p>
+
+
+<table>
+
+    <tr>
+        <td>
+            <i class="glyphicon glyphicon-user"></i>
+            <i>stire sugerata de</i>
+            <strong> @Model.User.UserName </strong>
+        </td>
+        <td>
+            @Model.suggDate
+        </td>
+        
+        <td>
+            @if (Model.suggState == 0)
+            {
+                <p>Pending</p>
+            }
+            else
+            {
+                if (Model.suggState == 1)
+                {
+                    <p>Accepted</p>
+                }
+                else
+                {
+                    <p>Rejected</p>
+                }
+            }
+        </td>
+
+    </tr>
+
+    <tr>
+        @if (User.IsInRole("Administrator") || User.Identity.Name == Model.Editor.UserName || User.Identity.Name == Model.User.UserName)
+        {
+            <td>
+                <a class="btn btn-success" href="/Suggestion/Edit/@Model.suggID">Modifica sugestie </a>
+            </td>
+            <td>
+                <form method="post" action="/Suggestion/Delete/@Model.suggID">
+
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button class="btn btn-success" type="submit">Sterge sugestie</button>
+
+                </form>
+            </td>
+        }
+    </tr>
+</table>

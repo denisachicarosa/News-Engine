@@ -263,10 +263,14 @@
     <Content Include="Views\News\PageSwitch.cshtml" />
     <Content Include="Views\News\MyNews.cshtml" />
     <Content Include="Views\Comment\Edit.cshtml" />
+    <Content Include="Views\Shared\SuggestionInfo.cshtml" />
+    <Content Include="Views\Suggestion\Index.cshtml" />
+    <Content Include="Views\Suggestion\New.cshtml" />
+    <Content Include="Views\Suggestion\Edit.cshtml" />
+    <Content Include="Views\Suggestion\Show.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Suggestion\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
