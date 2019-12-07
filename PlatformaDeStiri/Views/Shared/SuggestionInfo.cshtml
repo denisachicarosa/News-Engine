@@ -1,7 +1,8 @@
 ﻿@model PlatformaDeStiri.Models.Suggestion
 
 @Html.Label("suggTitle", "Denumire sugestie: ")
-<h4>@Model.suggTitle</h4>
+
+<h4>@Html.ActionLink(Model.suggTitle,"Show","Suggestion", new {id = Model.suggID }, null)</h4>
 <br />
 <p>@Model.suggContent</p>
 
@@ -38,7 +39,7 @@
 
     </tr>
 
-    <tr>
+    @*<tr>
         @if (User.IsInRole("Administrator") || User.Identity.Name == Model.Editor.UserName || User.Identity.Name == Model.User.UserName)
         {
             <td>
@@ -53,5 +54,5 @@
                 </form>
             </td>
         }
-    </tr>
+    </tr>*@
 </table>

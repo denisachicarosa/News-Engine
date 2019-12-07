@@ -114,33 +114,20 @@ namespace PlatformaDeStiri.Controllers
         
         public ActionResult Accept (int id)
         {
-            var suggestion = db.Suggestions.Find(id);
-            suggestion.suggState = 1; // acceptata
 
-            db.SaveChanges();
-
-            News news = new News();
-           
-            news.Title = suggestion.suggTitle;
-            news.Content = suggestion.suggContent;
-            news.Date = DateTime.Now;
-            news.UserID = suggestion.EditorID;
-            news.suggestedUser = suggestion.UserID;
-            news.Categories = GetAllCategories();
-
-            return View("New","News",news);
+            return RedirectToAction("NewFromSuggestion","News", new { id = id});
            
            }
 
 
-        [HttpPut]
+        [HttpGet]
         public ActionResult Reject (int id)
         {
             var suggestion = db.Suggestions.Find(id);
             suggestion.suggState = 2; //respinsa 
 
             db.SaveChanges();
-            return View("Index");
+            return RedirectToAction("Index");
         }
 
 

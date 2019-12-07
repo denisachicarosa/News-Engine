@@ -128,8 +128,53 @@ namespace PlatformaDeStiri.Controllers
 
             try
             {
+                System.Diagnostics.Debug.WriteLine("Titlu stire: " + news.Title);
                 db.News.Add(news);
                 db.SaveChanges();
+                TempData["message"] = "Stirea cu titlul '" +
+                    news.Title + "' a fost creata.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception e)
+            {
+                ViewBag.error = e.Message.ToString();
+                return View("Error");
+            }
+
+        }
+
+        public ActionResult NewFromSuggestion(int id)
+        {
+            var suggestion = db.Suggestions.Find(id);
+            suggestion.suggState = 1; // acceptata
+
+            db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine("[Suggestion Title: ]" + suggestion.suggTitle);
+            News newss = new News();
+
+            newss.Title = suggestion.suggTitle;
+            newss.Content = suggestion.suggContent;
+            newss.Date = DateTime.Now;
+            newss.UserID = suggestion.EditorID;
+            newss.suggestedUser = suggestion.UserID;
+            newss.Categories = GetAllCategories();
+
+            return View("New", newss);
+        }
+
+
+        [Authorize(Roles = "Editor, Administrator")]
+        [HttpPost]
+        public ActionResult NewFromSuggestion(News news)
+        {
+            news.Categories = GetAllCategories();
+
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("ID stire: " + news.ID);
+                db.News.Add(news);
+                db.SaveChanges();
+                System.Diagnostics.Debug.WriteLine("ID stire after: " + news.ID);
                 TempData["message"] = "Stirea cu titlul '" +
                     news.Title + "' a fost creata.";
                 return RedirectToAction("Index");

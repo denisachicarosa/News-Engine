@@ -3,9 +3,28 @@
 
 @Html.Partial("SuggestionInfo", Model)
 
-@if (Model.EditorID == ViewBag.currentUser)
+@if (Model.EditorID == ViewBag.currentUser &&  Model.suggState == 0)
 {
-   @Html.ActionLink("Respinge","Reject","Suggestion", new { id = Model.suggID }, null)
-   @Html.ActionLink("Accepta","Accept","Suggestion", new { id = Model.suggID}, null)
+    @Html.ActionLink("Respinge", "Reject", "Suggestion", new { id = Model.suggID }, null)
+    @Html.ActionLink("Accepta", "Accept", "Suggestion", new { id = Model.suggID }, null)
 
 }
+
+<table>
+<tr>
+    @if (User.IsInRole("Administrator") || User.Identity.Name == Model.Editor.UserName || User.Identity.Name == Model.User.UserName)
+    {
+        <td>
+            <a class="btn btn-success" href="/Suggestion/Edit/@Model.suggID">Modifica sugestie </a>
+        </td>
+        <td>
+            <form method="post" action="/Suggestion/Delete/@Model.suggID">
+
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <button class="btn btn-success" type="submit">Sterge sugestie</button>
+
+            </form>
+        </td>
+    }
+</tr>
+</table>

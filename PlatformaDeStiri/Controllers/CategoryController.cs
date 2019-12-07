@@ -80,7 +80,7 @@ namespace PlatformaDeStiri.Controllers
                   
                
             }
-            catch (Exception e)
+            catch (Exception )
             {
                 return View("Error");
             }
