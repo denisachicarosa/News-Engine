@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewBag.Title = "SearchNews";
+}
+
+<h2>Search News</h2>
+<h4>Found @ViewBag.searchResults.Count search results for <strong>@ViewBag.keywords</strong></h4>
+<hr />
+@foreach (PlatformaDeStiri.Models.News news in ViewBag.searchResults)
+{
+    @Html.Partial("NewsInfo", news)
+}

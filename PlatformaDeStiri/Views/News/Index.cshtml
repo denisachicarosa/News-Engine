@@ -1,5 +1,5 @@
 ﻿
-<h3>Afisare stiri</h3>
+<h3 align="center">Afisare stiri</h3>
 
 @if (TempData.ContainsKey("message"))
 {
@@ -7,6 +7,7 @@
     <h5>@TempData["message"]</h5>
     <hr />
 }
+
 
 @{
     int prevPage = ViewBag.pageNr - 1;
@@ -59,9 +60,9 @@ else
     <tr>
 
         <td class="prevPageStyle">
-                <button type="submit">
-                    @Html.ActionLink("<<", "PageSwitch", "News", new { currPage = prevPage }, null)
-                </button>
+            <button type="submit">
+                @Html.ActionLink("<<", "PageSwitch", "News", new { currPage = prevPage }, null)
+            </button>
         </td>
 
         <td>
