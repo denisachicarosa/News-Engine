@@ -261,10 +261,11 @@
     <Content Include="Views\Users\Show.cshtml" />
     <Content Include="Views\Users\Edit.cshtml" />
     <Content Include="Views\News\PageSwitch.cshtml" />
+    <Content Include="Views\News\MyNews.cshtml" />
+    <Content Include="Views\Comment\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Comment\" />
     <Folder Include="Views\Suggestion\" />
   </ItemGroup>
   <ItemGroup>
