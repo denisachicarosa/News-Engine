@@ -19,7 +19,9 @@ namespace PlatformaDeStiri.Controllers
         public ActionResult Index()
         {
             // Query the database for all the news
-            var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions");
+            var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions")
+                    .AsEnumerable().OrderBy(n => n.Date).Reverse().ToList();
+            
 
             if (TempData.ContainsKey("message"))
             {
