@@ -45,8 +45,8 @@ namespace PlatformaDeStiri.Controllers
             {
                 db.Comments.Add(comm);
                 db.SaveChanges();
-                TempData["message"] = "Comentariul a fost adauuuuuugat! ";
-                return RedirectToAction("Index");
+                TempData["message"] = "Comentariul a fost adaugat! ";
+                return RedirectToAction("Show", "News", new { ID = comm.commNewsID });
             }
             catch (Exception e)
             {
@@ -82,6 +82,7 @@ namespace PlatformaDeStiri.Controllers
             try
             {
                 Comment comm = db.Comments.Find(id);
+                System.Diagnostics.Debug.WriteLine(comm.commNewsID);
                 if (comm == null)
                     throw (new Exception());
                 return View(comm);
@@ -103,11 +104,11 @@ namespace PlatformaDeStiri.Controllers
                 
                 db_comm.commContent = comm.commContent;
                 db_comm.commDate = DateTime.Now;
-                db_comm.commUserID = User.Identity.GetUserId(); 
                 db.SaveChanges();
 
+               // System.Diagnostics.Debug.WriteLine(comm.commNewsID);
                 TempData["message"] = "Comentariul a fost actualizat.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Show","News", new { ID = db_comm.commNewsID});
             }
             catch (Exception)
             {
@@ -121,10 +122,11 @@ namespace PlatformaDeStiri.Controllers
         {
 
             Comment comm = db.Comments.Find(id);
+            var idNews = comm.commNewsID;
             db.Comments.Remove(comm);
             db.SaveChanges();
             TempData["message"] = "Comentariul a fost sters";
-            return RedirectToAction("Index");
+            return RedirectToAction("Show", "News", new { ID = idNews });
         }
     }
 }

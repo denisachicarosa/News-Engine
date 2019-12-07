@@ -13,10 +13,12 @@
 <br />
 <hr />
 
+@if (User.IsInRole("Administrator"))
+{
 <form method="post" action="/Category/Delete/@Model.ID">
     @Html.HttpMethodOverride(HttpVerbs.Delete)
     <br />
     <button class="btn btn-success" type="submit">Sterge categorie</button>
 
 </form>
-
+}

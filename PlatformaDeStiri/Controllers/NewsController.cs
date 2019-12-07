@@ -28,6 +28,24 @@ namespace PlatformaDeStiri.Controllers
             return View();
         }
 
+
+        public ActionResult MyNews()
+        {
+            var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions");
+            List<News> myNews = new List<News>();
+
+            foreach (News n in news)
+            {
+                if (n.User.Id == User.Identity.GetUserId())
+                {
+                    myNews.Add(n);
+                }
+            }
+
+            ViewBag.myNews = myNews;
+            return View("MyNews");
+        }
+
         [Authorize(Roles = "Editor, Administrator")]
         [HttpGet]
         public ActionResult New()
@@ -41,7 +59,7 @@ namespace PlatformaDeStiri.Controllers
             return View(news);
         }
 
-        [Authorize(Roles = "Editor, Administrator")]
+        
         [HttpPost]
         public ActionResult AddComment (string newsId, string commStr)
         {
@@ -59,9 +77,10 @@ namespace PlatformaDeStiri.Controllers
             db.SaveChanges();
             TempData["message"] = "Comentariul a fost adaugat.";
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Show","News", new { id = newsId});
         }
 
+        [Authorize(Roles = "Editor, Administrator")]
         [HttpPost]
         public ActionResult New(News news)
         {
@@ -180,6 +199,7 @@ namespace PlatformaDeStiri.Controllers
             }
         }
 
+
         [Authorize(Roles = "Editor, Administrator")]
         [HttpDelete]
         public ActionResult Delete(int id)
@@ -225,6 +245,8 @@ namespace PlatformaDeStiri.Controllers
 
 
     }
+
+   
 
 
 }

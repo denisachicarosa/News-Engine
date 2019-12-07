@@ -13,19 +13,26 @@
             @Model.commDate
         </td>
     </tr>
+
     <tr>
+        @if (User.Identity.Name == Model.user.UserName)
+        {
         <td>
             <a class="btn btn-success" href="/Comment/Edit/@Model.commID">Modifica comentariu </a>
         </td>
-        <td>
-            <form method="post" action="/Comment/Delete/@Model.commID">
+        }
+        @if (User.IsInRole("Administrator") || User.Identity.Name == Model.user.UserName || User.Identity.Name == Model.news.User.UserName)
+        {
+            <td>
+                <form method="post" action="/Comment/Delete/@Model.commID">
 
-                @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <br />
-                <button class="btn btn-success" type="submit">Sterge comentariu</button>
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <br />
+                    <button class="btn btn-success" type="submit">Sterge comentariu</button>
 
-            </form>
-        </td>
+                </form>
+            </td>
+        }
     </tr>
 </table>
 

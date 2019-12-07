@@ -1,0 +1,22 @@
+﻿@model PlatformaDeStiri.Models.News
+
+
+@{
+    ViewBag.Title = "MyNews";
+}
+
+<h2>MyNews</h2>
+
+@if (ViewBag.myNews.Count == 0)
+{
+    <p>Nu ati publicat stiri.</p>
+}
+else
+{
+    foreach (PlatformaDeStiri.Models.News news in ViewBag.myNews)
+    {
+        @Html.Partial("NewsInfo", news);
+        <br />
+        <hr />
+    }
+}
