@@ -281,10 +281,18 @@ namespace PlatformaDeStiri.Controllers
             return selectList;
         }
 
+        [HttpGet]
+        public ActionResult SearchNews (string keywords)
+        {
+            ViewBag.keywords = keywords;
+            var searchResults = db.News.SqlQuery("" +
+                "SELECT * FROM News " +
+                "WHERE lower(Title) LIKE '%" + keywords.ToLower() + "%'").ToList();
+            ViewBag.searchResults = searchResults;
+            return View();
+        }
+
 
     }
-
-   
-
 
 }

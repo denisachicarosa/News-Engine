@@ -28,7 +28,7 @@
                     @if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
                     {
                         <li>@Html.ActionLink("Adauga stire", "New", "News")</li>
-                        <li>@Html.ActionLink("Stiri proprii","MyNews","News")</li>
+                        <li>@Html.ActionLink("Stiri proprii", "MyNews", "News")</li>
                     }
                     @if (User.IsInRole("Administrator"))
                     {
@@ -38,10 +38,16 @@
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
+
+
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
+    <form class="nav navbar-nav navbar-right" style="margin:10px" method="get" action="/News/SearchNews">
+        <input type="text" name="keywords" size="30">
+        <button type="submit">Search</button>
+    </form>
     <div class="container body-content">
         @RenderBody()
         <hr />
