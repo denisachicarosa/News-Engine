@@ -96,6 +96,9 @@ namespace PlatformaDeStiri.Controllers
             news.Categories = GetAllCategories();
             news.Date = DateTime.Now;
 
+            List<Category> categs = db.Categories.ToList();
+            ViewBag.categories = categs;
+
             return View(news);
         }
 
@@ -122,13 +125,20 @@ namespace PlatformaDeStiri.Controllers
 
         [Authorize(Roles = "Editor, Administrator")]
         [HttpPost]
-        public ActionResult New(News news)
+        public ActionResult New(News news, string cumstomCategory)
         {
             news.Categories = GetAllCategories();
 
             try
             {
                 System.Diagnostics.Debug.WriteLine("Titlu stire: " + news.Title);
+                if (news.CategoryID == -999)
+                {
+                    Category category = new Category();
+                    category.Name = cumstomCategory;
+                    db.Categories.Add(category);
+                    news.CategoryID = category.ID;
+                }
                 db.News.Add(news);
                 db.SaveChanges();
                 TempData["message"] = "Stirea cu titlul '" +

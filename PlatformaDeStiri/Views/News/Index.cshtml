@@ -1,6 +1,7 @@
 ﻿
 <h3 align="center">Afisare stiri</h3>
 
+<!-- Notifications resulted from actions -->
 @if (TempData.ContainsKey("message"))
 {
     <hr />
@@ -8,15 +9,16 @@
     <hr />
 }
 
-
-@{
-    int prevPage = ViewBag.pageNr - 1;
-    int nextPage = ViewBag.pageNr + 1;
-}
-
+<!-- News showing -->
 @foreach (PlatformaDeStiri.Models.News elm in ViewBag.news)
 {
     @Html.Partial("NewsInfo", elm)
+}
+
+<!-- Page index declaration -->
+@{
+    int prevPage = ViewBag.pageNr - 1;
+    int nextPage = ViewBag.pageNr + 1;
 }
 
 <!-- Styles for bottom page ...-->
@@ -55,7 +57,7 @@ else
 }
 
 
-
+<!-- News page switch buttons -->
 <table align="center">
     <tr>
 
@@ -78,3 +80,78 @@ else
     </tr>
 </table>
 
+<!-- Test -->
+<table>
+    <tr>
+        <td>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    --sortare stiri--
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div>
+        </td>
+        <td id="table_space"></td>
+        <td>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    --alege categorie--
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+<style>
+    #table_space {
+        width: 15px
+    }
+
+    .dropbtn {
+        border: none;
+        outline: none;
+        color: white;
+        padding: 10px 16px;
+        background-color: #808080
+    }
+
+    /* Dropdown content (hidden by default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+        /* Links inside the dropdown */
+        .dropdown-content a {
+            float: none;
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+            .dropdown-content a:hover {
+                background-color: #cfcfcf
+            }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>
