@@ -3,7 +3,10 @@
 <a href="/News/Show/@Model.ID">
     <h3>@Model.Title</h3>
 </a>
+@Html.Partial("DbImageInfo", Model.Image)
 <p>@Model.Content</p>
+
+
 
 <table>
     <tr>
@@ -14,30 +17,30 @@
 
     <tr>
         <td>
-            <i class="glyphicon glyphicon-user"></i> 
-            <i>stire scrisa de</i> 
+            <i class="glyphicon glyphicon-user"></i>
+            <i>stire scrisa de</i>
             <strong> @Model.User.UserName </strong>
         </td>
         <td>
             @Model.Date
         </td>
-        
+
     </tr>
 
     <tr>
         @if (User.IsInRole("Administrator") || User.Identity.Name == Model.User.UserName)
         {
-        <td>
-            <a class="btn btn-success" href="/News/Edit/@Model.ID">Modifica stire </a>
-        </td>
-        <td>
-            <form method="post" action="/News/Delete/@Model.ID">
+            <td>
+                <a class="btn btn-success" href="/News/Edit/@Model.ID">Modifica stire </a>
+            </td>
+            <td>
+                <form method="post" action="/News/Delete/@Model.ID">
 
-                @Html.HttpMethodOverride(HttpVerbs.Delete)
-                <button class="btn btn-success" type="submit">Sterge stire</button>
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button class="btn btn-success" type="submit">Sterge stire</button>
 
-            </form>
-        </td>
+                </form>
+            </td>
         }
     </tr>
 </table>

@@ -17,8 +17,9 @@ namespace PlatformaDeStiri.Models
         public string UserID { get; set; }
         public int CategoryID { get; set; }
         public string suggestedUser { get; set; }
+        public int ImageID { get; set; }
 
-
+        public virtual DbImage Image { get; set; }
         public virtual ApplicationUser User { get; set; }
         public virtual Category Category { get; set; }
         public virtual IEnumerable<SelectListItem> Categories { get; set; }

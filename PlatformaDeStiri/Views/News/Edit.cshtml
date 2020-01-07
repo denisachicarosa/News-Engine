@@ -5,11 +5,12 @@
 }
 
 <h2>Edit</h2>
-
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    @Html.AntiForgeryToken()
-    
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+
+@Html.AntiForgeryToken()
+
 <div class="form-horizontal">
     <h4>News</h4>
     <hr />
@@ -38,10 +39,36 @@
 
     <div class="form-group">
         @Html.LabelFor(model => model.CategoryID, htmlAttributes: new { @class = "control-label col-md-2" })
-        @Html.ValidationMessageFor(m => m.CategoryID, "", new { @class = "text-danger " })
-        @Html.DropDownListFor(m => m.CategoryID,
-             new SelectList(Model.Categories, "Value", "Text"),
-             "Selectati categoria", new { @class = "form-control" })
+        <div class="col-md-10">
+
+            @{
+                System.Diagnostics.Debug.WriteLine("Got hir");
+            }
+
+            @foreach (PlatformaDeStiri.Models.Category cat in ViewBag.categories)
+            {
+                if (Model.CategoryID == cat.ID)
+                {
+                    @Html.RadioButtonFor(m => m.CategoryID, cat.ID, htmlAttributes: new { @checked = "true" }) @cat.Name <br />
+                }
+                else
+                {
+                    @Html.RadioButtonFor(m => m.CategoryID, cat.ID) @cat.Name <br />
+
+                }
+
+            }
+            @Html.RadioButtonFor(m => m.CategoryID, -999)
+            @Html.TextBox("cumstomCategory")
+        </div>
+    </div>
+    
+   
+    <p> Change photo</p>
+    <div class="form-group">
+        <div class="col-md-10">
+            <input type="file" name="ImageFile" id="ImageFile" required/>
+        </div>
     </div>
 
     <div class="form-group">
@@ -49,9 +76,9 @@
             <input type="submit" value="Save" class="btn btn-default" />
         </div>
     </div>
-    </div>
-    }
+</div>
+}
 
-    <div>
-        @Html.ActionLink("Back to List", "Index")
-    </div>
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
