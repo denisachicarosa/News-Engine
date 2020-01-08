@@ -13,13 +13,13 @@ namespace PlatformaDeStiri.Controllers
     public class NewsController : Controller
     {
         static int NEWS_PER_PAGE = 3;
-        private ApplicationDbContext db = new ApplicationDbContext();
+        protected ApplicationDbContext db = new ApplicationDbContext();
 
         // Auxiliar class for the index
         public class IndexIdentity
         {
             public static int NO_CATEG_FILTER = -1;
-            public static string NO_SORTING = null;
+            public static string NO_SORTING = "noo";
             public SelectListItem chosen_categ { set; get; }
             public SelectListItem chosen_sort { set; get; }
 
@@ -140,25 +140,50 @@ namespace PlatformaDeStiri.Controllers
             }
             public void SortAndFilter(List<News> news)
             {
-                int categ_index = chosen_categ.Value != null ? Int32.Parse(chosen_categ.Value)
-                       : NO_CATEG_FILTER;
-                if (categ_index != NO_CATEG_FILTER)
-                    news = news.Where(n => n.CategoryID == categ_index).ToList();
+                int categ_index = chosen_categ.Value != null 
+                    ? Int32.Parse(chosen_categ.Value)
+                    : NO_CATEG_FILTER;
+
                 if (chosen_sort.Value != NO_SORTING)
                     news.Sort(SortCond(chosen_sort.Value));
+
+                //if (categ_index != NO_CATEG_FILTER)
+                //{
+                //    //news = news.FindAll(n => n.CategoryID == categ_index).ToList();
+                //    List<News> filteredList = new List<News>();
+                //    foreach (News currNews in news)
+                //    {
+                //        if (currNews.CategoryID == categ_index)
+                //            filteredList.Add(currNews);
+                //    }
+                //    news = filteredList;
+                //}
+
+                System.Diagnostics.Debug.WriteLine("");
+                System.Diagnostics.Debug.WriteLine("[Filtering] categ-index = " + categ_index.ToString());
+                System.Diagnostics.Debug.WriteLine("[Sorting] sort-mode = " + chosen_sort.Value.ToString());
             }
         }
 
         // GET: Stire
         public ActionResult Index()
         {
-            // Query the database for all the news
-            List<News> news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions")
-                    .AsEnumerable().ToList();
-
             // Trying weird stulff
             IndexIdentity identity = new IndexIdentity();
             identity.ImportFromTempData(TempData);
+
+            // Query the database for all the news
+            List<News> news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions")
+                    .AsEnumerable().ToList();
+            if (identity.chosen_categ.Value != IndexIdentity.NO_CATEG_FILTER.ToString())
+            {
+                int theIndex = Int32.Parse(identity.chosen_categ.Value);
+                Category cat = db.Categories.Include("News").SingleOrDefault(c => c.ID == theIndex);
+                news = cat.News.ToList();
+            }
+            
+            identity.SortAndFilter(news);
+            identity.ExportToViewBag(ViewBag);
 
 
             // Motificatiton handling
@@ -166,8 +191,6 @@ namespace PlatformaDeStiri.Controllers
             {
                 ViewBag.message = TempData["message"].ToString();
             }
-            identity.SortAndFilter(news);
-            identity.ExportToViewBag(ViewBag);
 
             /**
             // Filtering by categoies
@@ -217,9 +240,14 @@ namespace PlatformaDeStiri.Controllers
             }
             */
 
+            List<SelectListItem> categories = new List<SelectListItem>();
+            categories.Add(new SelectListItem()
+            { Text = "All Categories", Value = IndexIdentity.NO_CATEG_FILTER.ToString() });
+            categories.AddRange(GetAllCategories());
+
             // Load trimmed list into viewbag
             ViewBag.news = news;
-            ViewBag.categs = GetAllCategories();
+            ViewBag.categs = categories;
             ViewBag.sorts = GetSortingMethods();
             return View();
         }
@@ -230,22 +258,7 @@ namespace PlatformaDeStiri.Controllers
             TempData["pageNr"] = currPage;
             return RedirectToAction("Index");
         }
-
-        [HttpGet]
-        public ActionResult SwitchCategory(string categTxt, string categVal)
-        {
-            SelectListItem chosen_categ = new SelectListItem { Text = categTxt, Value = categVal };
-
-            TempData["chosen_categ"] = chosen_categ;
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        public ActionResult SwitchSorting (string sortType)
-        {
-            TempData["chosen_sort"] = sortType;
-            return RedirectToAction("Index");
-        }
+        
 
         [HttpGet]
         public ActionResult SwitchSortOrFilter (string sortTxt, string sortVal, 
@@ -255,8 +268,8 @@ namespace PlatformaDeStiri.Controllers
             SelectListItem chosen_categ = new SelectListItem { Text = categTxt, Value = categVal };
 
             IndexIdentity identity = new IndexIdentity();
-            identity.chosen_categ = chosen_categ;
             identity.chosen_sort = chosen_sort;
+            identity.chosen_categ = chosen_categ;
             identity.ExportToTempData(TempData);
 
             return RedirectToAction("Index");

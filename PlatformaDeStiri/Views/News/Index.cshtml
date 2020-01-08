@@ -6,12 +6,8 @@
 @{
     //int prevPage = ViewBag.pageNr - 1;
     //int nextPage = ViewBag.pageNr + 1;
-    SelectListItem current_categ = TempData.ContainsKey("chosen_categ")
-        ? ViewBag.chosen_categ
-        : new SelectListItem { Text = "All categories", Value = null};
-    SelectListItem current_sort = TempData.ContainsKey("chosen_sort")
-        ? ViewBag.chosen_categ
-        : new SelectListItem { Text = "No sorting", Value = null };
+    SelectListItem current_categ = ViewBag.chosen_categ;
+    SelectListItem current_sort = ViewBag.chosen_sort;
 
 }
 
