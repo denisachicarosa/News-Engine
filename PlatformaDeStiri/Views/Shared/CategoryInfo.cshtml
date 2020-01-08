@@ -1,5 +1,6 @@
 ﻿@model PlatformaDeStiri.Models.Category
 
+<hr />
 @Html.Label("CategoryName", "Denumire categorie: ")
 <h4>@Model.Name</h4>
 <br />
@@ -11,14 +12,13 @@
     }
 </list>
 <br />
-<hr />
 
 @if (User.IsInRole("Administrator"))
 {
-<form method="post" action="/Category/Delete/@Model.ID">
-    @Html.HttpMethodOverride(HttpVerbs.Delete)
-    <br />
-    <button class="btn btn-success" type="submit">Sterge categorie</button>
+    <form method="post" action="/Category/Delete/@Model.ID">
+        @Html.HttpMethodOverride(HttpVerbs.Delete)
+        <br />
+        <button class="btn btn-success" type="submit">Sterge categorie</button>
 
-</form>
+    </form>
 }

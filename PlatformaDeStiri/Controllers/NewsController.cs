@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using Antlr.Runtime.Misc;
+using Microsoft.AspNet.Identity;
 using PlatformaDeStiri.Models;
 using System;
 using System.Collections.Generic;
@@ -14,20 +15,93 @@ namespace PlatformaDeStiri.Controllers
         static int NEWS_PER_PAGE = 3;
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        // Auxiliar class for the index
+        public class IndexIdentity
+        {
+            public SelectListItem chosen_categ { set; get; }
+            public SelectListItem chosen_sort { set; get; }
+            public int maxPgNr { set; get; }
+            public int pageNr { set; get; }
+
+            public IndexIdentity()
+            {
+                chosen_categ = chosen_sort = null;
+                maxPgNr = 99999
+;
+                pageNr = 1;
+            }
+
+            public void exportToViewBag(dynamic viewBag)
+            {
+                viewBag.chosen_categ = chosen_categ;
+                viewBag.chosen_sort = chosen_sort;
+                viewBag.maxPgNr = maxPgNr;
+                viewBag.pageNr = pageNr;
+            }
+            public int importFromTempData(dynamic tempData)
+            {
+                int succesful = 0;
+
+                if (tempData.ContainsKey("chosen_categ"))
+                {
+                    this.chosen_categ = (SelectListItem)tempData["chosen_categ"];
+                    succesful++;
+                }
+                if (tempData.ContainsKey("chosen_sort"))
+                {
+                    this.chosen_sort = (SelectListItem)tempData["chosen_sort"];
+                    succesful++;
+                }
+                if (tempData.ContainsKey("maxPgNr"))
+                {
+                    this.maxPgNr = (int)tempData["maxPgNr"];
+                    succesful++;
+                }
+                if (tempData.ContainsKey("pageNr"))
+                {
+                    this.pageNr = (int)tempData["pageNr"];
+                    succesful++;
+                }
+
+                return succesful;
+            }
+        }
+
         // GET: Stire
-        
         public ActionResult Index()
         {
             // Query the database for all the news
-            var news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions")
+            List<News> news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions")
                     .AsEnumerable().OrderBy(n => n.Date).Reverse().ToList();
             
-
+            // Motificatiton handling
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.message = TempData["message"].ToString();
             }
 
+            // Filtering by categoies
+            System.Func<News, bool> categ_condition = n => true;
+            if (TempData.ContainsKey("chosen_categ"))
+            {
+                SelectListItem chosen_categ = (SelectListItem)TempData["chosen_categ"];
+                if (chosen_categ.Value != null)
+                {
+                    System.Diagnostics.Debug.Write("[Categ] chosen_categ.Value = " + chosen_categ.Value);
+                    ViewBag.chosen_categ = chosen_categ;
+                    categ_condition = n => Int32.Parse(chosen_categ.Value).Equals(n.CategoryID);
+                }
+            }
+
+            // Sorting 
+            if (TempData.ContainsKey("chosen_sort"))
+            {
+                SelectListItem chosen_sort = (SelectListItem)TempData["chosen_sort"];
+                SelectListItem chosen_sortttt = new SelectListItem { Text = "some", Value = "Oher" };
+                ViewBag.chosen_categ = chosen_sort;
+                news.Sort(SortCond(chosen_sort.Value));
+                
+            }
             // Complete the ViewBag.maxPgNr and ViewBag.pageNr
             ViewBag.maxPgNr = news.Count() / NEWS_PER_PAGE + 1;
             ViewBag.pageNr = TempData.ContainsKey("pageNr") ? TempData["pageNr"] : 1;
@@ -40,7 +114,8 @@ namespace PlatformaDeStiri.Controllers
 
             foreach(News dbNews in news)
             {
-                if(ind >= firstIndex && ind < lastIndex)
+                if(ind >= firstIndex && ind < lastIndex 
+                    && categ_condition(dbNews))
                 {
                     newstoShow.Add(dbNews);
                 }
@@ -53,6 +128,8 @@ namespace PlatformaDeStiri.Controllers
 
             // Load trimmed list into viewbag
             ViewBag.news = newstoShow;
+            ViewBag.categs = GetAllCategories();
+            ViewBag.sorts = GetSortingMethods();
             return View();
         }
 
@@ -63,10 +140,102 @@ namespace PlatformaDeStiri.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public ActionResult SwitchCategory(string categTxt, string categVal)
+        {
+            SelectListItem chosen_categ = new SelectListItem { Text = categTxt, Value = categVal };
+
+            TempData["chosen_categ"] = chosen_categ;
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public ActionResult SwitchSorting (string sortType)
+        {
+            TempData["chosen_sort"] = sortType;
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public ActionResult SwitchSortOrFilter (string sortTxt, string sortVal, 
+            string categTxt, string categVal)
+        {
+            SelectListItem chosen_sort = new SelectListItem { Text = sortTxt, Value = sortVal };
+            SelectListItem chosen_categ = new SelectListItem { Text = categTxt, Value = categVal };
+
+            if (sortVal != null)
+                TempData["chosen_sort"] = chosen_sort;
+            if (categVal != null)
+                TempData["chosen_categ"] = chosen_categ;
+
+            return RedirectToAction("Index");
+        }
+
         [NonAction]
         private int min(int v1, int v2)
         {
             return v1 < v2 ? v1 : v2;
+        }
+
+        [NonAction]
+        private List<SelectListItem> GetSortingMethods ()
+        {
+            List<SelectListItem> selectLists = new List<SelectListItem>();
+            selectLists.Add(new SelectListItem
+            {
+                Text = "Ordine alfabetica",
+                Value = "alf"
+            });
+
+            selectLists.Add(new SelectListItem
+            {
+                Text = "Data aparitiei",
+                Value = "apr"
+            });
+
+            selectLists.Add(new SelectListItem
+            {
+                Text = "Lungimea descrierii (c)",
+                Value = "ldc"
+            });
+
+
+            selectLists.Add(new SelectListItem
+            {
+                Text = "Lungimea descrierii (d)",
+                Value = "ldd"
+            });
+
+            return selectLists;
+        }
+
+        [NonAction]
+        private Comparison<News> SortCond (string type)
+        {
+            Comparison<News> lambd = (n1, n2) => 0;
+            switch (type)
+            {
+                case "alf":
+                    lambd = (n1, n2) => n1.Title.CompareTo(n2.Title);
+                    break;
+
+                case "apr":
+                    lambd = (n1, n2) => n1.Date.CompareTo(n2.Date);
+                    break;
+
+                case "ldc":
+                    lambd = (n1, n2) => n1.Content.Count().CompareTo(n2.Content.Count());
+                    break;
+
+                case "ldd":
+                    lambd = (n1, n2) => n2.Content.Count().CompareTo(n1.Content.Count());
+                    break;
+
+                default:
+                    break;
+            }
+
+            return lambd;
         }
 
         public ActionResult MyNews()
@@ -348,8 +517,6 @@ namespace PlatformaDeStiri.Controllers
             ViewBag.searchResults = searchResults;
             return View();
         }
-
-
     }
 
 }
