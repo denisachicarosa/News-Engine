@@ -1,6 +1,16 @@
 ﻿
 <h3 align="center">Afisare stiri</h3>
 
+
+<!-- Variables declaration -->
+@{
+    //int prevPage = ViewBag.pageNr - 1;
+    //int nextPage = ViewBag.pageNr + 1;
+    SelectListItem current_categ = ViewBag.chosen_categ;
+    SelectListItem current_sort = ViewBag.chosen_sort;
+
+}
+
 <!-- Notifications resulted from actions -->
 @if (TempData.ContainsKey("message"))
 {
@@ -9,20 +19,63 @@
     <hr />
 }
 
+
+<!-- Sorting drop downs  -->
+<table align="left">
+    <tr>
+        <td>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    @current_sort.Text
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    @foreach (SelectListItem listItem in ViewBag.sorts)
+                    {
+                        <a name="categIndex" id="categIndex"
+                           onclick="location.href='@Url.Action("SwitchSortOrFilter", "News", 
+                                                  new {sortTxt = listItem.Text, sortVal = listItem.Value, 
+                                                  categTxt = current_categ.Text, categVal = current_categ.Value})'"
+                           >@listItem.Text</a>
+                    }
+                </div>
+            </div>
+        </td>
+        <td id="table_space"></td>
+        <td>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    @current_categ.Text
+                    <i class="fa fa-caret-down"></i>
+                </button>
+
+                <div class="dropdown-content">
+                    @foreach (SelectListItem listItem in ViewBag.categs)
+                    {
+                        <a name="categIndex" id="categIndex"
+                           onclick="location.href='@Url.Action("SwitchSortOrFilter", "News",
+                                                  new {sortTxt = current_sort.Text, sortVal = current_sort.Value, 
+                                                  categTxt = listItem.Text, categVal = listItem.Value})'"
+                           >@listItem.Text</a>
+                    }
+                </div>
+
+            </div>
+        </td>
+    </tr>
+</table>
+<br />
+<hr />
+
+
 <!-- News showing -->
 @foreach (PlatformaDeStiri.Models.News elm in ViewBag.news)
 {
     @Html.Partial("NewsInfo", elm)
 }
 
-<!-- Page index declaration -->
-@{
-    int prevPage = ViewBag.pageNr - 1;
-    int nextPage = ViewBag.pageNr + 1;
-}
-
-<!-- Styles for bottom page ...-->
-@if (ViewBag.pageNr.Equals(1))
+<!-- Styles for the page buttons ...-->
+@*@if (ViewBag.pageNr.Equals(1))
 {
     <style>
         .prevPageStyle {
@@ -54,11 +107,11 @@ else
             visibility: visible;
         }
     </style>
-}
+}*@
 
 
 <!-- News page switch buttons -->
-<table align="center">
+@*<table align="center">
     <tr>
 
         <td class="prevPageStyle">
@@ -78,40 +131,7 @@ else
         </td>
 
     </tr>
-</table>
-
-<!-- Test -->
-<table>
-    <tr>
-        <td>
-            <div class="dropdown">
-                <button class="dropbtn">
-                    --sortare stiri--
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a href="#">Link 1</a>
-                    <a href="#">Link 2</a>
-                    <a href="#">Link 3</a>
-                </div>
-            </div>
-        </td>
-        <td id="table_space"></td>
-        <td>
-            <div class="dropdown">
-                <button class="dropbtn">
-                    --alege categorie--
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a href="#">Link 1</a>
-                    <a href="#">Link 2</a>
-                    <a href="#">Link 3</a>
-                </div>
-            </div>
-        </td>
-    </tr>
-</table>
+</table>*@
 
 
 <style>
@@ -123,7 +143,8 @@ else
         border: none;
         outline: none;
         color: white;
-        padding: 10px 16px;
+        padding: 10px 10px;
+        font-size: 10px;
         background-color: #808080
     }
 
