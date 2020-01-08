@@ -412,10 +412,10 @@ namespace PlatformaDeStiri.Controllers
 
         [Authorize(Roles = "Editor, Administrator")]
         [HttpPost]
-        public ActionResult New(News news, string cumstomCategory, HttpPostedFileBase image)
+        public ActionResult New(News news, string cumstomCategory, HttpPostedFileBase ImageFile)
         {
             news.Categories = GetAllCategories();
-            System.Diagnostics.Debug.WriteLine(" mesaj din new cu post" + image.ToString());
+            System.Diagnostics.Debug.WriteLine(" mesaj din new cu post" + ImageFile.ToString());
 
             try
             {
@@ -423,12 +423,12 @@ namespace PlatformaDeStiri.Controllers
 
                 DbImage img = new DbImage();
 
-                img.ImageFile = image;
+                img.ImageFile = ImageFile;
                 img.Title = news.Title;
                
                 
-                string fileName = Path.GetFileNameWithoutExtension(image.FileName);
-                string extension = Path.GetExtension(image.FileName);
+                string fileName = Path.GetFileNameWithoutExtension(ImageFile.FileName);
+                string extension = Path.GetExtension(ImageFile.FileName);
                 fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
                 img.ImagePath = "~/Image/" + fileName;
 
