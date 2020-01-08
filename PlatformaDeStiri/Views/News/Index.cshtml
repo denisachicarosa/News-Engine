@@ -4,8 +4,8 @@
 
 <!-- Variables declaration -->
 @{
-    int prevPage = ViewBag.pageNr - 1;
-    int nextPage = ViewBag.pageNr + 1;
+    //int prevPage = ViewBag.pageNr - 1;
+    //int nextPage = ViewBag.pageNr + 1;
     SelectListItem current_categ = TempData.ContainsKey("chosen_categ")
         ? ViewBag.chosen_categ
         : new SelectListItem { Text = "All categories", Value = null};
@@ -79,7 +79,7 @@
 }
 
 <!-- Styles for the page buttons ...-->
-@if (ViewBag.pageNr.Equals(1))
+@*@if (ViewBag.pageNr.Equals(1))
 {
     <style>
         .prevPageStyle {
@@ -111,11 +111,11 @@ else
             visibility: visible;
         }
     </style>
-}
+}*@
 
 
 <!-- News page switch buttons -->
-<table align="center">
+@*<table align="center">
     <tr>
 
         <td class="prevPageStyle">
@@ -135,7 +135,7 @@ else
         </td>
 
     </tr>
-</table>
+</table>*@
 
 
 <style>

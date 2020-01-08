@@ -18,27 +18,27 @@ namespace PlatformaDeStiri.Controllers
         // Auxiliar class for the index
         public class IndexIdentity
         {
+            public static int NO_CATEG_FILTER = -1;
+            public static string NO_SORTING = null;
             public SelectListItem chosen_categ { set; get; }
             public SelectListItem chosen_sort { set; get; }
-            public int maxPgNr { set; get; }
-            public int pageNr { set; get; }
 
             public IndexIdentity()
             {
                 chosen_categ = chosen_sort = null;
-                maxPgNr = 99999
-;
-                pageNr = 1;
             }
 
-            public void exportToViewBag(dynamic viewBag)
+            public void ExportToViewBag(dynamic viewBag)
             {
                 viewBag.chosen_categ = chosen_categ;
                 viewBag.chosen_sort = chosen_sort;
-                viewBag.maxPgNr = maxPgNr;
-                viewBag.pageNr = pageNr;
             }
-            public int importFromTempData(dynamic tempData)
+            public void ExportToTempData(dynamic tempData)
+            {
+                tempData["chosen_categ"] = chosen_categ;
+                tempData["chosen_sort"] = chosen_sort;
+            }
+            public int ImportFromTempData(dynamic tempData)
             {
                 int succesful = 0;
 
@@ -47,23 +47,105 @@ namespace PlatformaDeStiri.Controllers
                     this.chosen_categ = (SelectListItem)tempData["chosen_categ"];
                     succesful++;
                 }
+                else
+                {
+                    this.chosen_categ = new SelectListItem()
+                        { Text = "All categories", Value = NO_CATEG_FILTER.ToString() };
+                }
+
                 if (tempData.ContainsKey("chosen_sort"))
                 {
                     this.chosen_sort = (SelectListItem)tempData["chosen_sort"];
                     succesful++;
                 }
-                if (tempData.ContainsKey("maxPgNr"))
+                else
                 {
-                    this.maxPgNr = (int)tempData["maxPgNr"];
-                    succesful++;
+                    this.chosen_sort = new SelectListItem()
+                    {
+                        Text = "No sorting",
+                        Value = NO_SORTING
+                    };
                 }
-                if (tempData.ContainsKey("pageNr"))
+                
+                return succesful;
+            }
+            private List<SelectListItem> GetSortingMethods()
+            {
+                List<SelectListItem> selectLists = new List<SelectListItem>();
+
+
+                selectLists.Add(new SelectListItem
                 {
-                    this.pageNr = (int)tempData["pageNr"];
-                    succesful++;
+                    Text = "No sorting",
+                    Value = "noo"
+                });
+
+                selectLists.Add(new SelectListItem
+                {
+                    Text = "Ordine alfabetica",
+                    Value = "alf"
+                });
+
+                selectLists.Add(new SelectListItem
+                {
+                    Text = "Data aparitiei",
+                    Value = "apr"
+                });
+
+                selectLists.Add(new SelectListItem
+                {
+                    Text = "Lungimea descrierii (c)",
+                    Value = "ldc"
+                });
+
+
+                selectLists.Add(new SelectListItem
+                {
+                    Text = "Lungimea descrierii (d)",
+                    Value = "ldd"
+                });
+
+                return selectLists;
+            }
+            private Comparison<News> SortCond(string type)
+            {
+                Comparison<News> lambd = (n1, n2) => 0;
+                switch (type)
+                {
+                    case "noo":
+                        lambd = (n1, n2) => 0;
+                        break;
+
+                    case "alf":
+                        lambd = (n1, n2) => n1.Title.CompareTo(n2.Title);
+                        break;
+
+                    case "apr":
+                        lambd = (n1, n2) => n1.Date.CompareTo(n2.Date);
+                        break;
+
+                    case "ldc":
+                        lambd = (n1, n2) => n1.Content.Count().CompareTo(n2.Content.Count());
+                        break;
+
+                    case "ldd":
+                        lambd = (n1, n2) => n2.Content.Count().CompareTo(n1.Content.Count());
+                        break;
+
+                    default:
+                        break;
                 }
 
-                return succesful;
+                return lambd;
+            }
+            public void SortAndFilter(List<News> news)
+            {
+                int categ_index = chosen_categ.Value != null ? Int32.Parse(chosen_categ.Value)
+                       : NO_CATEG_FILTER;
+                if (categ_index != NO_CATEG_FILTER)
+                    news = news.Where(n => n.CategoryID == categ_index).ToList();
+                if (chosen_sort.Value != NO_SORTING)
+                    news.Sort(SortCond(chosen_sort.Value));
             }
         }
 
@@ -72,14 +154,22 @@ namespace PlatformaDeStiri.Controllers
         {
             // Query the database for all the news
             List<News> news = db.News.Include("Category").Include("User").Include("Comments").Include("Suggestions")
-                    .AsEnumerable().OrderBy(n => n.Date).Reverse().ToList();
-            
+                    .AsEnumerable().ToList();
+
+            // Trying weird stulff
+            IndexIdentity identity = new IndexIdentity();
+            identity.ImportFromTempData(TempData);
+
+
             // Motificatiton handling
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.message = TempData["message"].ToString();
             }
+            identity.SortAndFilter(news);
+            identity.ExportToViewBag(ViewBag);
 
+            /**
             // Filtering by categoies
             System.Func<News, bool> categ_condition = n => true;
             if (TempData.ContainsKey("chosen_categ"))
@@ -125,9 +215,10 @@ namespace PlatformaDeStiri.Controllers
 
                 ind++;
             }
+            */
 
             // Load trimmed list into viewbag
-            ViewBag.news = newstoShow;
+            ViewBag.news = news;
             ViewBag.categs = GetAllCategories();
             ViewBag.sorts = GetSortingMethods();
             return View();
@@ -163,10 +254,10 @@ namespace PlatformaDeStiri.Controllers
             SelectListItem chosen_sort = new SelectListItem { Text = sortTxt, Value = sortVal };
             SelectListItem chosen_categ = new SelectListItem { Text = categTxt, Value = categVal };
 
-            if (sortVal != null)
-                TempData["chosen_sort"] = chosen_sort;
-            if (categVal != null)
-                TempData["chosen_categ"] = chosen_categ;
+            IndexIdentity identity = new IndexIdentity();
+            identity.chosen_categ = chosen_categ;
+            identity.chosen_sort = chosen_sort;
+            identity.ExportToTempData(TempData);
 
             return RedirectToAction("Index");
         }
@@ -181,6 +272,14 @@ namespace PlatformaDeStiri.Controllers
         private List<SelectListItem> GetSortingMethods ()
         {
             List<SelectListItem> selectLists = new List<SelectListItem>();
+
+
+            selectLists.Add(new SelectListItem
+            {
+                Text = "No sorting",
+                Value = "noo"
+            });
+
             selectLists.Add(new SelectListItem
             {
                 Text = "Ordine alfabetica",
@@ -215,6 +314,10 @@ namespace PlatformaDeStiri.Controllers
             Comparison<News> lambd = (n1, n2) => 0;
             switch (type)
             {
+                case "noo":
+                    lambd = (n1, n2) => 0;
+                    break;
+
                 case "alf":
                     lambd = (n1, n2) => n1.Title.CompareTo(n2.Title);
                     break;
