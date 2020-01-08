@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity;
 using PlatformaDeStiri.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -181,6 +182,7 @@ namespace PlatformaDeStiri.Controllers
                 Category cat = db.Categories.Include("News").SingleOrDefault(c => c.ID == theIndex);
                 news = cat.News.ToList();
             }
+
             
             identity.SortAndFilter(news);
             identity.ExportToViewBag(ViewBag);
@@ -410,12 +412,36 @@ namespace PlatformaDeStiri.Controllers
 
         [Authorize(Roles = "Editor, Administrator")]
         [HttpPost]
-        public ActionResult New(News news, string cumstomCategory)
+        public ActionResult New(News news, string cumstomCategory, HttpPostedFileBase image)
         {
             news.Categories = GetAllCategories();
+            System.Diagnostics.Debug.WriteLine(" mesaj din new cu post" + image.ToString());
 
             try
             {
+
+
+                DbImage img = new DbImage();
+
+                img.ImageFile = image;
+                img.Title = news.Title;
+               
+                
+                string fileName = Path.GetFileNameWithoutExtension(image.FileName);
+                string extension = Path.GetExtension(image.FileName);
+                fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                img.ImagePath = "~/Image/" + fileName;
+
+                fileName = Path.Combine(Server.MapPath("~/Image/"), fileName);
+                img.ImageFile.SaveAs(fileName);
+
+
+                
+                db.DbImages.Add(img);
+                //db.SaveChanges();
+                System.Diagnostics.Debug.WriteLine("Id imagine: " +img.ImageID);
+
+
                 System.Diagnostics.Debug.WriteLine("Titlu stire: " + news.Title);
                 if (news.CategoryID == -999)
                 {
@@ -423,7 +449,10 @@ namespace PlatformaDeStiri.Controllers
                     category.Name = cumstomCategory;
                     db.Categories.Add(category);
                     news.CategoryID = category.ID;
+                    
                 }
+                news.ImageID = img.ImageID;
+
                 db.News.Add(news);
                 db.SaveChanges();
                 TempData["message"] = "Stirea cu titlul '" +
@@ -453,6 +482,8 @@ namespace PlatformaDeStiri.Controllers
             newss.UserID = suggestion.EditorID;
             newss.suggestedUser = suggestion.UserID;
             newss.Categories = GetAllCategories();
+            List<Category> categs = db.Categories.ToList();
+            ViewBag.categories = categs;
 
             return View("New", newss);
         }
@@ -515,6 +546,10 @@ namespace PlatformaDeStiri.Controllers
                     throw (new Exception());
                 news.Categories = GetAllCategories();
 
+                List<Category> categs = db.Categories.ToList();
+                ViewBag.categories = categs;
+               // System.Diagnostics.Debug.WriteLine("categorie selectata IN EDIT GET: " + news.CategoryID);
+
                 if (news.UserID == User.Identity.GetUserId() || User.IsInRole("Administrator"))
                 {
                     return View(news);
@@ -535,24 +570,70 @@ namespace PlatformaDeStiri.Controllers
         }
 
         [Authorize(Roles = "Editor, Administrator")]
-        [HttpPost]
-        public ActionResult Edit(int id, News news)
+        [HttpPut]
+        public ActionResult Edit(int id, News news,  string cumstomCategory, HttpPostedFileBase ImageFile)
         {
             news.Categories = GetAllCategories();
             try
             {
-                if (ModelState.IsValid)
-                {
+               // if (ModelState.IsValid)
+               // {
                     News db_news = db.News.Find(id);
                     if (db_news.UserID == User.Identity.GetUserId() || User.IsInRole("Administrator"))
                     {
-                        if (TryUpdateModel(news))
-                        {
-                            db_news.Title = news.Title;
-                            db_news.Content = news.Content;
-                            db_news.Date = DateTime.Now;
-                            db_news.UserID = User.Identity.GetUserId();
+                    System.Diagnostics.Debug.WriteLine(" first if");
+
+                    if (TryUpdateModel(db_news))
+                       {
+                       
+
+                        db_news.Title = news.Title;
+                        
+                        db_news.Content = news.Content;
+                        db_news.Date = DateTime.Now;
+                        db_news.UserID = User.Identity.GetUserId();
+
+                        System.Diagnostics.Debug.WriteLine(" db_news.Title " + db_news.Title);
+
+                        System.Diagnostics.Debug.WriteLine(" db_news.Content " + db_news.Content);
+                        System.Diagnostics.Debug.WriteLine(" db_news.Date " + db_news.Date);
+
+                        System.Diagnostics.Debug.WriteLine(" db_news.UserID " + db_news.UserID);
+                        if (news.CategoryID == -999)
+                            {
+                                Category category = new Category();
+                                category.Name = cumstomCategory;
+                                db.Categories.Add(category);
+                                news.CategoryID = category.ID;
+
+                            }
+
+                    
                             db_news.CategoryID = news.CategoryID;
+                        System.Diagnostics.Debug.WriteLine(" db_news.CategoryID " + db_news.CategoryID);
+
+                        if (ImageFile != null && ImageFile.ContentLength > 0)
+                            {
+                                DbImage img = new DbImage();
+
+
+                                img.Title = news.Title;
+                                img.ImageFile = ImageFile;
+
+                                string fileName = Path.GetFileNameWithoutExtension(ImageFile.FileName);
+                                string extension = Path.GetExtension(ImageFile.FileName);
+                                fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                                img.ImagePath = "~/Image/" + fileName;
+
+                                fileName = Path.Combine(Server.MapPath("~/Image/"), fileName);
+                                img.ImageFile.SaveAs(fileName);
+
+
+                                db.DbImages.Add(img);
+                                db_news.ImageID = img.ImageID;
+                            }
+
+
                             db.SaveChanges();
 
                             TempData["message"] = "Stirea cu titlul '" +
@@ -565,11 +646,12 @@ namespace PlatformaDeStiri.Controllers
                         TempData["message"] = "Nu aveti dreptul sa faceti modificari!";
                         return RedirectToAction("Index");
                     }
-                }
-                else
+                //}
+              /*  else
                 {
-                    return View(news);
-                }
+                    System.Diagnostics.Debug.WriteLine(" Invalid Model State");
+                    return RedirectToAction("Index");
+                }*/
             }
             catch (Exception)
             {
